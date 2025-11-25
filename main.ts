@@ -12,62 +12,125 @@ function moveSpriteInTime (sprite2: Sprite, x: number, y: number, t: number) {
 }
 controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
     controller.moveSprite(mySprite, 50, 50)
-    mySprite.setImage(assets.image`
-                player_projectile
-                `)
+    mySprite.setImage(assets.image`player_hitbox`)
     mySprite.z = 1
     small_hitbox = true
     mySprite2 = sprites.create(assets.image`Player`, SpriteKind.sprite)
 })
 function spell1 () {
-    enemyShootAimingPlayer(boss, 90, 5)
+    enemy_shoot_aiming_player(boss, mySprite3.image, 90, 30)
 }
 function moveSpriteRandom (sprite3: Sprite, yLowerBound: number, outerBound: number, v: number) {
     moveSprite(sprite3, randint(outerBound, scene.screenWidth() - outerBound), randint(outerBound, yLowerBound), v)
 }
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    shootBulletFromSprite(mySprite, 200, -90)
+    shoot_bullet_from_sprite(mySprite, mySprite.image, 200, -90)
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Projectile, function (sprite4, otherSprite2) {
-    if (!(iframe)) {
+    if (!(iframe) && !(debug_mode)) {
         info.changeLifeBy(-1)
         scene.cameraShake(3, 200)
         music.playTone(139, music.beat(BeatFraction.Eighth))
         otherSprite2.destroy()
         iframe = true
         for (let index = 0; index < 5; index++) {
-            mySprite.setImage(assets.image`Player_Iframe`)
-            pause(50)
-            mySprite.setImage(assets.image`Player`)
-            pause(50)
+            if (small_hitbox) {
+                mySprite2.setImage(assets.image`Player_Iframe`)
+                pause(50)
+                mySprite2.setImage(assets.image`Player`)
+                pause(50)
+            } else {
+                mySprite.setImage(assets.image`Player_Iframe`)
+                pause(50)
+                mySprite.setImage(assets.image`Player`)
+                pause(50)
+            }
         }
         iframe = false
     }
 })
+function shoot_bullet_from_sprite (source_sprite: Sprite, projectile_image: Image, speed: number, angle: number) {
+    projectile = sprites.createProjectileFromSprite(img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `, source_sprite, speed * Math.cos(angle / 57.3), speed * Math.sin(angle / 57.3))
+    projectile.setFlag(SpriteFlag.AutoDestroy, true)
+    if (source_sprite.kind() == SpriteKind.Player) {
+        projectile.setKind(SpriteKind.PlayerShot)
+        projectile.setImage(assets.image`player_bullet`)
+    } else {
+        projectile.setImage(projectile_image)
+    }
+}
 function nonSpell1 () {
+    mySprite3.setImage(assets.image`boss_bullet`)
     while (index2 <= MAX - 1) {
-        shootBulletFromSprite(boss, 60, 360 / MAX * index2 + offset)
+        shoot_bullet_from_sprite(boss, mySprite3.image, 360 / MAX * index22 + offset, 1)
+        index22 += 1
         index2 += 1
     }
     offset += 13
 }
-function init_boss (difficulty: number) {
-	
+function spell3 () {
+    shoot_bullet_from_sprite(boss, mySprite3.image, 360 / MAX, 0 + offset)
+    shoot_bullet_from_sprite(boss, mySprite3.image, 360 / MAX, 180 + offset)
+    shoot_bullet_from_sprite(boss, mySprite3.image, 360 / MAX, 270 - offset)
+    shoot_bullet_from_sprite(boss, mySprite3.image, 360 / MAX, (90 - offset) * -1)
+    offset += 48
 }
 function spell2 () {
     for (let index3 = 0; index3 <= 4; index3++) {
-        shootBulletFromSprite(boss, 60, offset + index3 * 30)
+        shoot_bullet_from_sprite(boss, mySprite3.image, 60, offset + index3 * 30)
     }
     offset += 23
 }
-function Spell3 () {
-    while (index4 <= MAX - 1) {
-        shootBulletFromSprite(boss, 60, 360 / MAX + index4 + offset)
-        index4 += 1
-    }
-}
-function init (difficulty: number) {
-	
+function init () {
+    iframe = false
+    small_hitbox = false
+    mySprite = sprites.create(img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `, SpriteKind.Player)
+    bossLife = 48
+    boss = sprites.create(assets.image`Boss`, SpriteKind.Enemy)
+    lifeBarPic = image.create(96, 5)
+    lifeBar = sprites.create(lifeBarPic, SpriteKind.LifeBar)
+    offset = 0
+    MAX = 10
+    bossCanMove = true
+    mySprite.setPosition(80, 105)
+    mySprite.setFlag(SpriteFlag.StayInScreen, true)
+    boss.setPosition(-16, -16)
+    lifeBar.setPosition(80, 5)
+    lifeBar.setFlag(SpriteFlag.Ghost, true)
 }
 function framedMenu () {
     myMenu = miniMenu.createMenu(
@@ -120,17 +183,11 @@ function framedMenu () {
     myMenu.setStyleProperty(miniMenu.StyleKind.Default, miniMenu.StyleProperty.Foreground, 1)
     myMenu.onButtonPressed(controller.A, function (selection, selectedIndex) {
         myMenu.close()
-        if (selectedIndex == 0) {
-            init(0)
-        } else if (selectedIndex == 1) {
-            init(1)
-        } else if (selectedIndex == 2) {
-            init(2)
-        } else if (selectedIndex == 3) {
-            init(3)
-        } else if (selectedIndex == 4) {
-            init(4)
-        }
+        info.setScore(0)
+        mySprite.setImage(assets.image`Player`)
+        controller.moveSprite(mySprite)
+        preSetBossPosition(80, 30)
+        set_difficulty(selectedIndex)
     })
 }
 sprites.onOverlap(SpriteKind.Enemy, SpriteKind.PlayerShot, function (sprite22, otherSprite) {
@@ -156,48 +213,20 @@ function preSetBossPosition (x2: number, y2: number) {
 }
 controller.B.onEvent(ControllerButtonEvent.Released, function () {
     controller.moveSprite(mySprite)
-    mySprite.setImage(assets.image`Player_Iframe`)
-    sprites.destroy(mySprite2)
     small_hitbox = false
+    mySprite.setImage(assets.image`Player`)
+    sprites.destroy(mySprite2)
 })
+function enemy_shoot_aiming_player (sprite: Sprite, projectile_image: Image, speed: number, spread: number) {
+    shoot_bullet_from_sprite(sprite, projectile_image, speed, Math.atan2(mySprite.y - sprite.y, mySprite.x - sprite.x) * 57.3 + randint(0 - spread, spread))
+}
 function moveSpriteRandomFixedTime (sprite5: Sprite, yLowerBound2: number, outerBound2: number, u: number) {
     moveSpriteInTime(sprite5, randint(outerBound2, scene.screenWidth() - outerBound2), randint(outerBound2, yLowerBound2), u)
 }
 function nonSpell2 () {
-    while (index32 <= MAX - 1) {
-        shootBulletFromSprite(boss, 60, 360 / MAX * index32 + offset)
-        shootBulletFromSprite(boss, 100, 360 / MAX * (index32 + 0.5) + offset)
-        index32 += 1
-    }
-}
-function init_player (difficulty: number) {
-	
-}
-function shootBulletFromSprite (sourceSprite: Sprite, speed: number, angle: number) {
-    projectile = sprites.createProjectileFromSprite(img`
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        `, sourceSprite, speed * Math.cos(angle / 57.3), speed * Math.sin(angle / 57.3))
-    projectile.setFlag(SpriteFlag.AutoDestroy, true)
-    if (sourceSprite.kind() == SpriteKind.Player) {
-        projectile.setKind(SpriteKind.PlayerShot)
-        projectile.setImage(assets.image`player_bullet`)
-    } else {
-        projectile.setImage(assets.image`boss_bullet`)
+    for (let index = 0; index <= MAX; index++) {
+        shoot_bullet_from_sprite(boss, mySprite3.image, 60, 360 / MAX * index + offset)
+        shoot_bullet_from_sprite(boss, mySprite3.image, 100, 360 / MAX * (index + 0.5) + offset)
     }
 }
 function moveSprite (sprite6: Sprite, x3: number, y3: number, w: number) {
@@ -210,61 +239,51 @@ function moveSprite (sprite6: Sprite, x3: number, y3: number, w: number) {
         sprite6.setVelocity(dx / speed3 * w, dy / speed3 * w)
     }
 }
-function enemyShootAimingPlayer (sprite7: Sprite, speed2: number, spread: number) {
-    shootBulletFromSprite(sprite7, speed2, Math.atan2(mySprite.y - sprite7.y, mySprite.x - sprite7.x) * 57.3 + randint(0 - spread, spread))
+function set_difficulty (difficulty: number) {
+    if (difficulty == 0) {
+        debug_mode = true
+        info.setLife(20)
+    } else {
+        info.setLife(20 / difficulty)
+    }
+    mySprite3 = sprites.create(assets.image`boss_bullet`, SpriteKind.Projectile)
 }
 let lifeBarProgress = 0
 let bossProgress = 0
 let speed3 = 0
-let projectile: Sprite = null
-let index32 = 0
 let ready = false
 let started = false
 let myMenu: miniMenu.MenuSprite = null
-let index4 = 0
+let bossCanMove = false
+let lifeBar: Sprite = null
+let lifeBarPic: Image = null
+let bossLife = 0
+let offset = 0
+let index22 = 0
+let MAX = 0
 let index2 = 0
+let projectile: Sprite = null
+let debug_mode = false
+let iframe = false
+let mySprite3: Sprite = null
+let boss: Sprite = null
 let mySprite2: Sprite = null
+let small_hitbox = false
+let mySprite: Sprite = null
 let dy = 0
 let dx = 0
 let globalY = 0
 let globalX = 0
-let MAX = 0
-let offset = 0
-let lifeBar: Sprite = null
-let lifeBarPic: Image = null
-let boss: Sprite = null
-let bossLife = 0
-let mySprite: Sprite = null
-let small_hitbox = false
-let iframe = false
 scene.setBackgroundColor(10)
-init(0)
+framedMenu()
 music.setVolume(20)
-iframe = false
-small_hitbox = false
-info.setLife(20)
-info.setScore(0)
-mySprite = sprites.create(assets.image`Player`, SpriteKind.Player)
-mySprite.setPosition(80, 105)
-mySprite.setFlag(SpriteFlag.StayInScreen, true)
-controller.moveSprite(mySprite)
-bossLife = 48
-boss = sprites.create(assets.image`Boss`, SpriteKind.Enemy)
-boss.setPosition(-16, -16)
-lifeBarPic = image.create(96, 5)
-lifeBar = sprites.create(lifeBarPic, SpriteKind.LifeBar)
-lifeBar.setPosition(80, 5)
-lifeBar.setFlag(SpriteFlag.Ghost, true)
-offset = 0
-MAX = 10
-let bossCanMove = true
-preSetBossPosition(80, 30)
+init()
 game.onUpdate(function () {
     if (Math.abs(boss.x - globalX) + Math.abs(boss.y - globalY) <= 2) {
         boss.setVelocity(0, 0)
         if (!(ready)) {
             bossProgress += 1
-            if (bossProgress == 2) {
+            if (bossProgress == 1) {
                 bossCanMove = false
             } else {
                 if (bossProgress == 2) {
@@ -300,13 +319,6 @@ game.onUpdateInterval(150, function () {
         }
     }
 })
-game.onUpdateInterval(500, function () {
-    if (started) {
-        if (bossProgress == 1) {
-            Spell3()
-        }
-    }
-})
 game.onUpdateInterval(100, function () {
     if (ready && !(started)) {
         if (lifeBarProgress < 4) {
@@ -316,6 +328,13 @@ game.onUpdateInterval(100, function () {
             lifeBarProgress += 1
         } else {
             started = true
+        }
+    }
+})
+game.onUpdateInterval(200, function () {
+    if (started) {
+        if (bossProgress == 1) {
+            spell3()
         }
     }
 })
